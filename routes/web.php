@@ -1,7 +1,9 @@
 <?php
-
+use App\Http\Controllers\announcementcontroller;
+use App\Http\Controllers\dashboardcontroller;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Announcement;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,10 +19,21 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::middleware(['auth'])->group(function(){
+    Route::get('/announcements/create',
+    [announcementcontroller::class,
+    'create'])
+    ->middleware('admin')
+    ->name('announcement.store');
+});
 
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/dashboard', [dashboardcontroller::class, 'index'])->name('dashboard');
+ROUTE::get('/announcement', [announcementcontroller::class, 'create'])->name('announcement.create');
+Route::post('/announcement', [announcementcontroller::class, 'store'])->name('announcement.store');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -243,7 +243,7 @@
             </li>
 
             <li>
-                <a href="#" class="active">
+                <a href="{{ route('announcement.create') }}" class="active">
                     <span class="icon">
                         <img src="{{ asset('icons/announcement.svg')}}" alt="Announcement">
                         </span>
@@ -301,35 +301,47 @@
         </h2>
 
         <div class="announcement-grid">
-
-            <div class="announcement-card">
-                <div>
-                    <h3>First meeting</h3>
-                    <p>At 15:00</p>
-                </div>
-            </div>
-
-            <div class="announcement-card">
-                <div>
-                    <h3>Second meeting</h3>
-                    <p>At 15:00</p>
-                </div>
-            </div>
-
-            <div class="announcement-card">
-                <div>
-                    <h3>Third meeting</h3>
-                    <p>At 15:00</p>
-                </div>
-            </div>
-
-            <div class="announcement-card">
-                <div>
-                    <h3>Last meeting</h3>
-                    <p>At 15:00</p>
-                </div>
-            </div>
-
+ @if($announcement)
+        <div class="announcement-card">
+                        <h3>{{$announcement->title}}</h3>
+                              <p>{{$announcement->content}}</p>
+                    </div>
+                    @else
+                      <p>no announcement available.</p>
+                        @endif   
+    
+ @if($announcement)
+        <div class="announcement-card">
+                        <h3>{{$announcement->title}}</h3>
+                              <p>{{$announcement->content}}</p>
+                    </div>
+                    @else
+                      <p>no announcement available.</p>
+                        @endif   
+    
+ @if($announcement)
+        <div class="announcement-card">
+                        <h3>{{$announcement->title}}</h3>
+                              <p>{{$announcement->content}}</p>
+                    </div>
+                    @else
+                      <p>no announcement available.</p>
+                        @endif   
+    
+ @if($announcement)
+        <div class="announcement-card">
+                        <h3>{{$announcement->title}}</h3>
+                              <p>{{$announcement->content}}</p>
+                    </div>
+                    @else
+                      <p>no announcement available.</p>
+                        @endif   
+@if(auth()->user()->role ==='admin')
+<a
+href="{{route('announcement.create')}}">
+write annoubcement
+</a>
+@endif
         </div>
 
     </main>
