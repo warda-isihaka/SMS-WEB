@@ -252,7 +252,7 @@
             </li>
 
             <li>
-                <a href="#" class="active" >
+               <a href="/user-management" class="active">
                     <span class="icon">
                         <img src="{{ asset('icons/settings.svg')}}" alt="Settings">
                     </span>

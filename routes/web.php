@@ -2,6 +2,7 @@
 use App\Http\Controllers\announcementcontroller;
 use App\Http\Controllers\dashboardcontroller;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Announcement;
 
@@ -39,6 +40,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/user-management', [UserManagementController::class, 'index'])->name('user-management');
+
+// Route ya kuhifadhi/usave data kwenye database (POST)
+Route::post('/user-management/save', [UserManagementController::class, 'update'])->name('users.update');
 });
 
 require __DIR__.'/auth.php';
