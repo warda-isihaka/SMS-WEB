@@ -5,6 +5,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Announcement;
+use App\Http\Controllers\PledgeController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -15,7 +17,9 @@ use App\Models\Announcement;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "web" middleware group. Make something great!
 |
-*/
+*/Route::get('/', function () {
+    return view('welcome');
+});
 
 Route::get('/', function () {
     return view('welcome');
@@ -50,5 +54,14 @@ Route::post('/user-management/save', [UserManagementController::class, 'update']
 Route::get('/budget', function () {
     return view('budget');
 })->middleware(['auth'])->name('budget.index');
+
+// Route za Pledge
+Route::get('/pledges/create', [PledgeController::class, 'create'])->name('pledges.create');
+Route::post('/pledges', [PledgeController::class, 'store'])->name('pledges.store');
+// Unaweza kuongeza route ya status pia
+Route::get('/pledges/status', [PledgeController::class, 'status'])->name('pledges.status');
+
+
+
 
 require __DIR__.'/auth.php';
