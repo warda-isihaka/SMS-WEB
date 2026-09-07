@@ -336,7 +336,7 @@
                     @else
                       <p>no announcement available.</p>
                         @endif   
-@if(auth()->user()->role ==='admin')
+@if (auth()->user() && auth()->user()->role === 'admin')
 <a
 href="{{route('announcement.create')}}">
 write annoubcement
