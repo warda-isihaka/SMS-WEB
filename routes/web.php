@@ -46,4 +46,8 @@ Route::middleware('auth')->group(function () {
 Route::post('/user-management/save', [UserManagementController::class, 'update'])->name('users.update');
 });
 
+Route::get('/budget', function () {
+    return view('budget');
+})->middleware(['auth'])->name('budget.index');
+
 require __DIR__.'/auth.php';

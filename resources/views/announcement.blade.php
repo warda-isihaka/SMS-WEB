@@ -16,7 +16,23 @@
             background: white;
             padding: 30px;
             border-radius: 15px;
+            
+            
         }
+        .back-arrow {
+  position: absolute;
+  left: 50;
+  top: 10%;
+  transform: translateY(-50%);
+  font-size: 24px;
+  text-decoration: none;
+  color: #333;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.back-arrow:hover {
+  color: #8b4513;}
         h1 {
             color: #222;
         }
@@ -57,6 +73,9 @@
 <body>
 
 <div class="container">
+    <a href="javascript:history.back()" class="back-arrow" aria-label="Go back">
+    &#8592;
+  </a>
     <h1>SHEREHE MANAGEMENT SYSTEM</h1>
     @if(session('success'))
         <div class="success">
