@@ -24,11 +24,12 @@ use App\Http\Controllers\PledgeController;
 Route::get('/', function () {
     return view('welcome');
 });
-use App\Http\Middleware\AdminMiddleware; // Or use Laravel Gates / Spatie Permissions
-
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
-    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+Route::middleware(['auth'])->group(function(){
+    Route::get('/announcements/create',
+    [announcementcontroller::class,
+    'create'])
+    ->middleware('admin')
+    ->name('announcement.store');
 });
 
 Route::get('/dashboard', function () {
@@ -66,4 +67,9 @@ Route::get('/pledges/status', [PledgeController::class, 'status'])->name('pledge
 Route::get('/card', function () {
     return view('card');
 })->middleware(['auth'])->name('card.index');
+
+
+Route::get('/pledge_management', function () {
+    return view('pledge_management');
+})->middleware(['auth'])->name('pledge_management.index');
 require __DIR__.'/auth.php';
