@@ -8,6 +8,7 @@ use App\Models\Announcement;
 use App\Http\Controllers\PledgeController;
 
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -56,13 +57,24 @@ Route::get('/budget', function () {
 })->middleware(['auth'])->name('budget.index');
 
 // Route za Pledge
-Route::get('/pledges/create', [PledgeController::class, 'create'])->name('pledges.create');
-Route::post('/pledges', [PledgeController::class, 'store'])->name('pledges.store');
-// Unaweza kuongeza route ya status pia
-Route::get('/pledges/status', [PledgeController::class, 'status'])->name('pledges.status');
 
 
+// Route ya kuonyesha fomu ya kuunda (create)
+Route::get('/create', [PledgeController::class, 'create'])->name('create');
+Route::post('/create', [PledgeController::class, 'store'])->name('store');
 
+// Route ya kuonyesha status
+Route::get('/status', [PledgeController::class, 'status'])->name('status');
+
+Route::get('/status', function () {
+    return view('status');
+})->middleware(['auth'])->name('status.index');
+
+// Route ya kufungua ukurasa wa status
+Route::get('/status', [PledgeController::class, 'showStatus'])->name('status');
+
+// Route ya kufanya utafutaji wa status kwa namba ya simu
+Route::get('/status/search', [PledgeController::class, 'searchStatus'])->name('status.search');
 
 Route::get('/card', function () {
     return view('card');

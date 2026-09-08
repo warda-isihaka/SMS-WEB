@@ -336,7 +336,7 @@
         </ul>
 
         <div class="logout">
-            <a href="#">
+            <a href="/logout">
                 <img src="{{ asset('icons/logout.svg')}}" alt="Logout">logout
             </a>
         </div>
