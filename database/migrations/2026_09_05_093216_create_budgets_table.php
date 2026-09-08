@@ -10,10 +10,9 @@ return new class extends Migration
     {
         Schema::create('budgets', function (Blueprint $table) {
             $table->id('budget_id'); // Primary key 
-            $table->foreignId('user_id')->constrained('users', 'user_id')->onDelete('cascade'); // Foreign key
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Foreign key
             $table->integer('amount'); // Allocated amount
             $table->timestamps();
-        });
     }
 
     public function down(): void
