@@ -24,12 +24,11 @@ use App\Http\Controllers\PledgeController;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::middleware(['auth'])->group(function(){
-    Route::get('/announcements/create',
-    [announcementcontroller::class,
-    'create'])
-    ->middleware('admin')
-    ->name('announcement.store');
+use App\Http\Middleware\AdminMiddleware; // Or use Laravel Gates / Spatie Permissions
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
+    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
 });
 
 Route::get('/dashboard', function () {

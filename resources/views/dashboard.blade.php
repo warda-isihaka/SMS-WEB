@@ -129,43 +129,58 @@
         }
 
         /* ANNOUNCEMENT */
-        .announcement-title {
-            font-size: 25px;
-            margin-bottom: 35px;
-            font-weight: 600;
+    
+       /* Container for the 2-column grid */
+.announcement-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important; /* Forces exactly 2 equal columns */
+    gap: 20px !important;                             /* Space between cards */
+    max-width: 800px;                                 /* Prevents cards from expanding endlessly */
+    width: 100%;
+    margin-top: 20px;
+    box-sizing: border-box;
+}
+
+/* Individual card styling */
+.announcement-card {
+    border: 1.5px solid #c8a264;
+    border-radius: 12px;
+    background-color: #ffffff;
+    min-height: 140px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+}
+
+/* Centering content inside the card */
+.announcement-box {
+    width: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 20px;
+}
+
+.announcement-box p {
+    margin: 0 0 6px 0;
+    color: #666666;
+    font-size: 1.1rem;
+}
+
+.announcement-box small {
+    color: #999999;
+    font-size: 0.875rem;
+}
+        
+
+        .announcement-grid .announcement-box:hover {
+            transform:translatey(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.12);
         }
 
-        .announcement-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 335px);
-            gap: 55px 40px;
-        }
-
-        .announcement-card {
-            height: 150px;
-            border: 1px solid #d8d8d8;
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            border-color: #ab6005;
-            transition: 0.2s;
-        }
-
-        .announcement-card:hover {
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-        }
-
-        .announcement-card h3 {
-            font-size: 20px;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .announcement-card p {
-            font-size: 17px;
-        }
+        
 
         /* MOBILE */
         @media (max-width: 800px) {
@@ -182,10 +197,11 @@
             .main {
                 padding: 25px;
             }
-
-            .announcement-grid {
-                grid-template-columns: 1fr;
-            }
+            .announcement-grid{
+             grid-template-columns: 1fr !important;
+             row-gap: 20px !important;;
+           }
+            
         }
     </style>
 </head>
@@ -301,48 +317,18 @@
         </h2>
 
         <div class="announcement-grid">
- @if($announcement)
-        <div class="announcement-card">
-                        <h3>{{$announcement->title}}</h3>
-                              <p>{{$announcement->content}}</p>
-                    </div>
-                    @else
-                      <p>no announcement available.</p>
-                        @endif   
-    
- @if($announcement)
-        <div class="announcement-card">
-                        <h3>{{$announcement->title}}</h3>
-                              <p>{{$announcement->content}}</p>
-                    </div>
-                    @else
-                      <p>no announcement available.</p>
-                        @endif   
-    
- @if($announcement)
-        <div class="announcement-card">
-                        <h3>{{$announcement->title}}</h3>
-                              <p>{{$announcement->content}}</p>
-                    </div>
-                    @else
-                      <p>no announcement available.</p>
-                        @endif   
-    
- @if($announcement)
-        <div class="announcement-card">
-                        <h3>{{$announcement->title}}</h3>
-                              <p>{{$announcement->content}}</p>
-                    </div>
-                    @else
-                      <p>no announcement available.</p>
-                        @endif   
-@if(auth()->user()->role ==='admin')
-<a
-href="{{route('announcement.create')}}">
-write annoubcement
-</a>
-@endif
-        </div>
+       @for ($i = 1; $i <= 4; $i++)
+       @if (isset($boxes[$i]))
+        <div class="announcement-card" >
+            <div class="announcement-box">
+                <p>{{ $boxes[$i]->content }}</p>
+                <small>{{ $boxes[$i]->created_at->format('d M Y') }}</small>
+                  </div>
+               </div>                     
+         @endif
+         @endfor
+</div>
+ 
 
     </main>
 
