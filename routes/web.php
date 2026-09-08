@@ -51,4 +51,7 @@ Route::get('/budget', function () {
     return view('budget');
 })->middleware(['auth'])->name('budget.index');
 
+Route::get('/card', function () {
+    return view('card');
+})->middleware(['auth'])->name('card.index');
 require __DIR__.'/auth.php';

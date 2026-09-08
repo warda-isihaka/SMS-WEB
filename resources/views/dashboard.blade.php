@@ -225,7 +225,7 @@
             </li>
 
             <li>
-                <a href="#" class="active">
+                <a href="/budget" class="active">
                     <span class="icon">
                         <img src="{{ asset('icons/budget.svg')}}" alt="Budget">
                     </span>
@@ -234,7 +234,7 @@
             </li>
 
             <li>
-                <a href="#" class="active">
+                <a href="/card" class="active">
                     <span class="icon">
                         <img src="{{ asset('icons/cards.svg')}}" alt="Cards">
                     </span>
