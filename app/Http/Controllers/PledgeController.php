@@ -1,70 +1,77 @@
 <?php 
+
 namespace App\Http\Controllers;
+
 use App\Models\Pledge;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class PledgeController extends Controller
 {
-    /**
-     * Display the pledge form.
-     *
-     * @return \Illuminate\View\View
-     */
     public function create()
     {
-        // Unaweza kuongeza data zingine za contact hapa, kama contacts za viongozi
         $contacts = [
             'CHAIRPERSON' => '07xx xxx xxx',
-            'ACCOUNTANT' => '07xx xxx xxx',
+            'ACCOUNTANT'  => '07xx xxx xxx',
         ];
 
-        return view('pledges.create', compact('contacts'));
+        // Mipangilio ya chaguomsingi ikiwa huna Setting model
+        $settings = (object)[
+            'single_amount' => 50000,
+            'double_amount' => 100000,
+        ];
+
+        return view('create', compact('contacts', 'settings'));
     }
 
-    /**
-     * Store a newly created pledge in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function store(Request $request)
     {
-        // 1. Validation
         $validator = Validator::make($request->all(), [
-            'category' => 'required|in:SINGLE,DOUBLE,OTHERS',
-            'amount' => 'required|numeric|min:0',
-            // Payment method can be nullable if they don't select immediately
+            'category'       => 'required|in:SINGLE,DOUBLE,OTHERS',
+            'amount'         => 'required|numeric|min:0',
             'payment_method' => 'nullable|in:M-PESA,AIRTEL MONEY,MIXX BY YAS,HALOPESA', 
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('pledges.create')
+            return redirect()->route('create')
                         ->withErrors($validator)
                         ->withInput();
         }
 
-        // 2. Create the pledge
         Pledge::create([
-            'category' => $request->category,
-            'amount' => $request->amount,
+            'category'       => $request->category,
+            'amount'         => $request->amount,
             'payment_method' => $request->payment_method,
-            'status' => 'pending', // Default status
+            'status'         => 'pending',
         ]);
 
-        // 3. Redirect with success message
-        return redirect()->route('pledges.create')->with('success', 'Ahadi yako imerekodiwa kikamilifu!');
+        return redirect()->route('create')->with('success', 'Ahadi yako imerekodiwa kikamilifu!');
     }
 
-    /**
-     * Display the status of pledges. (Example)
-     *
-     * @return \Illuminate\View\View
-     */
-    public function status()
+    // Onyesha ukurasa wa status mara ya kwanza (kabla ya kutafuta)
+    public function showStatus()
     {
-        // Hapa utatafuta pledges zote au za user fulani
-        $pledges = Pledge::orderBy('created_at', 'desc')->get();
-        return view('pledges.status', compact('pledges'));
+        return view('status');
+    }
+
+    // Tafuta taarifa za ahadi kwa namba ya simu
+    public function searchStatus(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required',
+        ]);
+
+        $phone = $request->input('phone');
+
+        // Tafuta ahadi ya hivi karibuni inayofanana na namba iliyoingizwa
+        $pledge = Pledge::where('phone', $phone)->latest()->first();
+
+        // Hesabu salio lililobaki ikiwa ahadi imepatikana
+        $remain = 0;
+        if ($pledge) {
+            $remain = ($pledge->amount ?? 0) - ($pledge->paid_amount ?? $pledge->paid ?? 0);
+        }
+
+        return view('status', compact('pledge', 'remain'));
     }
 }

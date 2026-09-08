@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Foreign key
             $table->integer('amount'); // Allocated amount
             $table->timestamps();
+        }); // <-- HAPA NDIPO PALIPOPOKOSA: Mabano na semikoloni vilikosekana
     }
 
     public function down(): void

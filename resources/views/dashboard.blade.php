@@ -216,7 +216,7 @@
             </li>
 
             <li>
-                <a href="#" class="active">
+                <a href="/create" class="active">
                     <span class="icon">
                         <img src="{{ asset('icons/pledge.svg')}}" alt="Pledge">
                     </span>
@@ -225,7 +225,7 @@
             </li>
 
             <li>
-                <a href="#" class="active">
+                <a href="/budget" class="active">
                     <span class="icon">
                         <img src="{{ asset('icons/budget.svg')}}" alt="Budget">
                     </span>
@@ -234,7 +234,7 @@
             </li>
 
             <li>
-                <a href="#" class="active">
+                <a href="/card" class="active">
                     <span class="icon">
                         <img src="{{ asset('icons/cards.svg')}}" alt="Cards">
                     </span>
@@ -263,7 +263,7 @@
         </ul>
 
         <div class="logout">
-            <a href="#">
+            <a href="/logout">
                 <img src="{{ asset('icons/logout.svg')}}" alt="Logout">logout
             </a>
         </div>
