@@ -1,69 +1,52 @@
 <?php
-use App\Http\Controllers\announcementcontroller;
-use App\Http\Controllers\dashboardcontroller;
+
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserManagementController;
-use Illuminate\Support\Facades\Route;
-use App\Models\Announcement;
 use App\Http\Controllers\PledgeController;
-
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/Route::get('/', function () {
-    return view('welcome');
-});
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('welcome');
 });
-use App\Http\Middleware\AdminMiddleware; // Or use Laravel Gates / Spatie Permissions
 
+// Admin-only routes
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcements.create');
-    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcements.store');
+    Route::get('/announcements/create', [AnnouncementController::class, 'create'])->name('announcement.create');
+    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('announcement.store');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::get('/dashboard', [dashboardcontroller::class, 'index'])->name('dashboard');
-ROUTE::get('/announcement', [announcementcontroller::class, 'create'])->name('announcement.create');
-Route::post('/announcement', [announcementcontroller::class, 'store'])->name('announcement.store');
-
+// Authenticated User routes (Requires login / registration)
 Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // User Management
     Route::get('/user-management', [UserManagementController::class, 'index'])->name('user-management');
+    Route::post('/user-management/save', [UserManagementController::class, 'update'])->name('users.update');
 
-// Route ya kuhifadhi/usave data kwenye database (POST)
-Route::post('/user-management/save', [UserManagementController::class, 'update'])->name('users.update');
+    // Budget & Cards
+    Route::get('/budget', function () { return view('budget'); })->name('budget.index');
+    Route::get('/card', function () { return view('card'); })->name('card.index');
+
+    // Pledges
+    Route::get('/pledges/create', [PledgeController::class, 'create'])->name('pledges.create');
+    Route::post('/pledges', [PledgeController::class, 'store'])->name('pledges.store');
+    Route::get('/pledges/status', [PledgeController::class, 'status'])->name('pledges.status');
 });
 
-Route::get('/budget', function () {
-    return view('budget');
-})->middleware(['auth'])->name('budget.index');
+// Authentication routes (Laravel Breeze / Fortify)
+require __DIR__ . '/auth.php';
 
-// Route za Pledge
-Route::get('/pledges/create', [PledgeController::class, 'create'])->name('pledges.create');
-Route::post('/pledges', [PledgeController::class, 'store'])->name('pledges.store');
-// Unaweza kuongeza route ya status pia
-Route::get('/pledges/status', [PledgeController::class, 'status'])->name('pledges.status');
-
-
-
-
-Route::get('/card', function () {
-    return view('card');
-})->middleware(['auth'])->name('card.index');
-require __DIR__.'/auth.php';
+// Logout route -> redirects to register page
+Route::get('/logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/register');
+})->name('logout');

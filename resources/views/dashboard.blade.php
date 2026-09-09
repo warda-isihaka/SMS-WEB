@@ -232,7 +232,7 @@
             </li>
 
             <li>
-                <a href="#" class="active">
+                <a href="/pledges" class="active">
                     <span class="icon">
                         <img src="{{ asset('icons/pledge.svg')}}" alt="Pledge">
                     </span>
@@ -278,11 +278,16 @@
 
         </ul>
 
-        <div class="logout">
-            <a href="#">
-                <img src="{{ asset('icons/logout.svg')}}" alt="Logout">logout
-            </a>
-        </div>
+      <div class="logout">
+    <a href="{{ route('logout') }}" 
+       onclick="event.preventDefault(); if(confirm('Are you sure you want to log out?')) { document.getElementById('logout-form').submit(); }">
+        <img src="{{ asset('icons/logout.svg') }}" alt="Logout"> logout
+    </a>
+
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+</div>
 
     </aside>
 
