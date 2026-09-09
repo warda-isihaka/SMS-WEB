@@ -54,24 +54,33 @@ class PledgeController extends Controller
         return view('status');
     }
 
-    // Tafuta taarifa za ahadi kwa namba ya simu
-    public function searchStatus(Request $request)
-    {
-        $request->validate([
-            'phone' => 'required',
-        ]);
+   public function searchStatus(Request $request)
+{
+    $request->validate([
+        'phone' => 'required',
+    ]);
 
-        $phone = $request->input('phone');
+    $phone = $request->input('phone');
 
-        // Tafuta ahadi ya hivi karibuni inayofanana na namba iliyoingizwa
-        $pledge = Pledge::where('phone', $phone)->latest()->first();
+    // Vuta taarifa zote za ahadi kutoka kwenye database kulingana na namba ya simu
+    $pledge = Pledge::where('phone', $phone)->latest()->first();
 
-        // Hesabu salio lililobaki ikiwa ahadi imepatikana
-        $remain = 0;
-        if ($pledge) {
-            $remain = ($pledge->amount ?? 0) - ($pledge->paid_amount ?? $pledge->paid ?? 0);
-        }
-
-        return view('status', compact('pledge', 'remain'));
+    // Kama namba haipo kwenye database
+    if (!$pledge) {
+        return redirect()->back()->withErrors(['phone' => 'Namba hii haijapatikana kwenye mfumo.']);
     }
+
+    // Hesabu salio
+    $amount = $pledge->amount ?? 0;
+    $paid = $pledge->paid ?? 0;
+    $remain = $amount - $paid;
+
+    // KAMA REMAIN NI ZERO (HADAIWI) -> REDIRECT KWENYE CARD
+    if ($remain <= 0 && $amount > 0) {
+        return view('card', compact('pledge'));
+    }
+
+    // KAMA BADO ANADAIWA -> ONYESHA STATUS
+    return view('status', compact('pledge', 'remain'));
+}
 }
