@@ -33,3 +33,5 @@ class announcementcontroller extends Controller
         return redirect()->route('announcement.create')->with('success', 'Announcement posted successfully!');
     }
 }
+
+

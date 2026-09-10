@@ -7,6 +7,8 @@ use App\Http\Controllers\PledgeController;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AnnouncementController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -72,3 +74,4 @@ Route::get('/pledge_management', function () {
 })->middleware(['auth'])->name('pledge_management.index');
 
 require __DIR__.'/auth.php';
+
