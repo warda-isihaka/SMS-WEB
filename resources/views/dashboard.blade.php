@@ -286,13 +286,13 @@
                 <!-- POP-UP MENU YA PEMBENI (WEKA LINK ZAKO HAPA) -->
                 <ul class="flyout-menu" id="pledgeFlyout">
                     <li>
-                        <a href="#">Create</a>
+                        <a href="/create">Create</a>
                     </li>
                     <li>
                         <a href="/pledge_management">Manage</a>
                     </li>
                     <li>
-                        <a href="#">Status</a>
+                        <a href="{{ route('pledge_status') }}">Status</a>
                     </li>
                 </ul>
             </li>

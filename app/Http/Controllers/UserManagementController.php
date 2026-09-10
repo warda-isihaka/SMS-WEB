@@ -1,12 +1,17 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\User; 
 use App\Models\Role;
 use Illuminate\Http\Request;
 
 class UserManagementController extends Controller
 {
+    public function store(Request $request)
+{
+    return $this->update($request);
+}
     // Function ya kuonyesha ukurasa na kuvuta users kutoka database
     public function index()
     {
@@ -32,11 +37,10 @@ class UserManagementController extends Controller
                 }
             }
 
-            // Sync itahifadhi au kurekebisha roles za user kwenye role_user pivot table
+            // Sync inasave/kufuta roles za user kwenye role_user table
             $user->roles()->sync($userRoleIds);
         }
 
         return redirect()->back()->with('success', 'Taarifa za majukumu zimehifadhiwa kikamilifu!');
     }
-
 }

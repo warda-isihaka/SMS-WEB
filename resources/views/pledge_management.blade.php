@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Pledge - Sherehe Management System</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         * {
             margin: 0;
@@ -76,8 +77,8 @@
         }
 
         .btn-toggle {
-            background-color: #dfb15b;
-            color: #000;
+            background-color: brown;
+            color: #fff;
             border: none;
             padding: 12px 30px;
             font-size: 15px;
@@ -90,7 +91,7 @@
         }
 
         .btn-toggle:hover {
-            background-color: #f0f0f0;
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -111,36 +112,23 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Juma Hamisi</td>
-                    <td class="promise-val">100000</td>
-                    <td class="amount-val">100000</td>
-                    <td class="paid-val">40000</td>
-                    <td class="remain-val">0</td>
+                @foreach($pledges as $index => $pledge)
+                <tr data-id="{{ $pledge->pledge_id }}">
+                    <td>{{ $index + 1 }}</td>
+                    {{-- Kuvuta Jina kutoka Relationship ya User --}}
+                    <td>{{ $pledge->user->name ?? 'N/A' }}</td>
+                    <td class="promise-val">{{ $pledge->category }}</td>
+                    <td class="amount-val">{{ $pledge->amount }}</td>
+                    <td class="paid-val">{{ $pledge->paid ?? 0 }}</td>
+                    <td class="remain-val">{{ $pledge->remain ?? ($pledge->amount - ($pledge->paid ?? 0)) }}</td>
                 </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Amina Said</td>
-                    <td class="promise-val">200000</td>
-                    <td class="amount-val">200000</td>
-                    <td class="paid-val">150000</td>
-                    <td class="remain-val">0</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Baraka Ally</td>
-                    <td class="promise-val">50000</td>
-                    <td class="amount-val">50000</td>
-                    <td class="paid-val">50000</td>
-                    <td class="remain-val">0</td>
-                </tr>
+                @endforeach
             </tbody>
             <tfoot>
                 <tr class="total-row">
                     <td></td>
                     <td>Total</td>
-                    <td id="totalPromise">0</td>
+                    <td id="totalPromise">-</td>
                     <td id="totalAmount">0</td>
                     <td id="totalPaid">0</td>
                     <td id="totalRemain">0</td>
@@ -149,22 +137,23 @@
         </table>
     </div>
 
+    <!-- Kitufe kitatokea iwapo tu aliyelogin ni Accountant -->
+@if(auth()->user() && auth()->user()->role === 'accountant')
     <div class="btn-container">
-        <button id="editBtn" class="btn-toggle" onclick="toggleEdit()">Edit</button>
+        <button id="editBtn" class="btn-action" onclick="toggleEdit()">Edit</button>
     </div>
+@endif
 
     <script>
         let isEditing = false;
 
         function calculateTotals() {
             let rows = document.querySelectorAll('#pledgeTable tbody tr');
-            let grandPromise = 0;
             let grandAmount = 0;
             let grandPaid = 0;
             let grandRemain = 0;
 
             rows.forEach(row => {
-                let promise = parseFloat(row.querySelector('.promise-val').innerText) || 0;
                 let amount = parseFloat(row.querySelector('.amount-val').innerText) || 0;
                 let paidCell = row.querySelector('.paid-val');
                 let paid = 0;
@@ -177,25 +166,26 @@
 
                 // Remain = Amount - Paid
                 let remain = amount - paid;
+                if (remain < 0) remain = 0;
+
                 row.querySelector('.remain-val').innerText = remain;
 
-                grandPromise += promise;
                 grandAmount += amount;
                 grandPaid += paid;
                 grandRemain += remain;
             });
 
-            document.getElementById('totalPromise').innerText = grandPromise;
             document.getElementById('totalAmount').innerText = grandAmount;
             document.getElementById('totalPaid').innerText = grandPaid;
             document.getElementById('totalRemain').innerText = grandRemain;
         }
 
-        function toggleEdit() {
+        async function toggleEdit() {
             let btn = document.getElementById('editBtn');
             let paidCells = document.querySelectorAll('.paid-val');
 
             if (!isEditing) {
+                // Badili kwenda Edit mode
                 paidCells.forEach(cell => {
                     let currentVal = cell.innerText;
                     cell.innerHTML = `<input type="number" class="paid-input" value="${currentVal}" oninput="calculateTotals()">`;
@@ -204,15 +194,56 @@
                 btn.innerText = "Update";
                 isEditing = true;
             } else {
-                paidCells.forEach(cell => {
-                    let inputVal = cell.querySelector('input').value;
-                    cell.innerText = inputVal || 0;
+                // Chukua Data zote za Paid na Remain na kuzituma Server
+                let pledgesToUpdate = [];
+
+                document.querySelectorAll('#pledgeTable tbody tr').forEach(row => {
+                    let pledgeId = row.getAttribute('data-id');
+                    let amount = parseFloat(row.querySelector('.amount-val').innerText) || 0;
+                    let paidInput = row.querySelector('.paid-val input');
+                    let paidVal = paidInput ? (parseFloat(paidInput.value) || 0) : 0;
+                    let remainVal = amount - paidVal;
+                    if (remainVal < 0) remainVal = 0;
+
+                    pledgesToUpdate.push({
+                        id: pledgeId,
+                        paid: paidVal,
+                        remain: remainVal
+                    });
                 });
 
-                calculateTotals();
+                // Tuma data kwenye Controller kupitia Fetch API
+                try {
+                    let response = await fetch("{{ route('pledge.updateStatusAndPaid') }}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({ pledges: pledgesToUpdate })
+                    });
 
-                btn.innerText = "Edit";
-                isEditing = false;
+                    let result = await response.json();
+
+                    if (result.success) {
+                        alert("Data za Paid na Remain zimehifadhiwa kikamilifu kwenye Database!");
+                        
+                        // Rudisha table kwenye muonekano wa kawaida
+                        paidCells.forEach(cell => {
+                            let inputVal = cell.querySelector('input').value;
+                            cell.innerText = inputVal || 0;
+                        });
+
+                        calculateTotals();
+                        btn.innerText = "Edit";
+                        isEditing = false;
+                    } else {
+                        alert("Kuna shida imetokea wakati wa kuhifadhi!");
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Imeshindwa kuunganisha na server.");
+                }
             }
         }
 

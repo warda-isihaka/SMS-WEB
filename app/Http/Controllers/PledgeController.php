@@ -1,77 +1,100 @@
-<?php 
+<?php
 
 namespace App\Http\Controllers;
 
 use App\Models\Pledge;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class PledgeController extends Controller
 {
+    // 1. Method ya kuonyesha fomu ya /create
     public function create()
     {
-        $contacts = [
-            'CHAIRPERSON' => '07xx xxx xxx',
-            'ACCOUNTANT'  => '07xx xxx xxx',
-        ];
-
-        // Mipangilio ya chaguomsingi ikiwa huna Setting model
         $settings = (object)[
             'single_amount' => 50000,
             'double_amount' => 100000,
         ];
 
-        return view('create', compact('contacts', 'settings'));
+        return view('create', compact('settings'));
     }
 
+    // 2. Method ya kuhifadhi ahadi kutoka kwenye fomu kwenda database
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'category'       => 'required|in:SINGLE,DOUBLE,OTHERS',
-            'amount'         => 'required|numeric|min:0',
-            'payment_method' => 'nullable|in:M-PESA,AIRTEL MONEY,MIXX BY YAS,HALOPESA', 
+        $request->validate([
+            'category' => 'required|in:SINGLE,DOUBLE,OTHERS',
+            'amount'   => 'required|numeric|min:1',
         ]);
-
-        if ($validator->fails()) {
-            return redirect()->route('create')
-                        ->withErrors($validator)
-                        ->withInput();
-        }
 
         Pledge::create([
-            'category'       => $request->category,
-            'amount'         => $request->amount,
-            'payment_method' => $request->payment_method,
-            'status'         => 'pending',
+            'user_id'  => auth()->id(),
+            'category' => $request->category,
+            'amount'   => $request->amount,
+            'paid'     => 0,
+            'remain'   => $request->amount,
+            'status'   => 'pending',
         ]);
 
-        return redirect()->route('create')->with('success', 'Ahadi yako imerekodiwa kikamilifu!');
+        return redirect()->back()->with('success', 'Ahadi yako imerekodiwa kikamilifu!');
     }
 
-    // Onyesha ukurasa wa status mara ya kwanza (kabla ya kutafuta)
+    // 3. ONGEZA HII: Inaonyesha ukurasa wa status wa user aliyelogin
     public function showStatus()
     {
-        return view('status');
+        $pledges = Pledge::where('user_id', auth()->id())->get();
+        return view('status', compact('pledges'));
     }
 
-    // Tafuta taarifa za ahadi kwa namba ya simu
+    // 4. ONGEZA HII: Inatafuta status ya ahadi
     public function searchStatus(Request $request)
     {
-        $request->validate([
-            'phone' => 'required',
-        ]);
+        $search = $request->input('search');
 
-        $phone = $request->input('phone');
+        $pledges = Pledge::whereHas('user', function ($q) use ($search) {
+            $q->where('phone', 'like', "%{$search}%")
+              ->orWhere('name', 'like', "%{$search}%");
+        })->get();
 
-        // Tafuta ahadi ya hivi karibuni inayofanana na namba iliyoingizwa
-        $pledge = Pledge::where('phone', $phone)->latest()->first();
+        return view('status', compact('pledges'));
+    }
 
-        // Hesabu salio lililobaki ikiwa ahadi imepatikana
-        $remain = 0;
-        if ($pledge) {
-            $remain = ($pledge->amount ?? 0) - ($pledge->paid_amount ?? $pledge->paid ?? 0);
+    // 5. Admin: Ukurasa wa usimamizi
+    public function pledgeManagement()
+    {
+        $pledges = Pledge::with('user')->get();
+        return view('pledge_management', compact('pledges'));
+    }
+
+    // 6. Admin: Kurekebisha malipo na status
+    public function updateStatusAndPaid(Request $request)
+    {
+        $pledgesData = $request->input('pledges', []);
+
+        foreach ($pledgesData as $item) {
+            $pledge = Pledge::find($item['id']);
+
+            if ($pledge) {
+                $pledge->paid = $item['paid'];
+                $pledge->remain = $item['remain'];
+
+                if ($pledge->remain == 0 && $pledge->paid > 0) {
+                    $pledge->status = 'completed';
+                } else {
+                    $pledge->status = 'pending';
+                }
+
+                $pledge->save();
+            }
         }
 
-        return view('status', compact('pledge', 'remain'));
+        return response()->json(['success' => true]);
     }
+
+        public function showCard()
+{
+    // Inavuta ahadi ya hivi karibuni ya user aliyelogin
+    $pledge = Pledge::where('user_id', auth()->id())->latest()->first();
+
+    return view('card', compact('pledge'));
+}
 }

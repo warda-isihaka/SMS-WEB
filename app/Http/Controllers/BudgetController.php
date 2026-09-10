@@ -36,4 +36,6 @@ class BudgetController extends Controller
 
         return redirect()->back()->with('success', 'Budget item added successfully!');
     }
+
+    
 }

@@ -89,7 +89,7 @@
             <div class="alert-success">{{ session('success') }}</div>
         @endif
 
-        <form id="accessForm" action="#" method="POST">
+        <form id="accessForm" action="{{ route('roles.store') }}" method="POST">
             @csrf
             <table>
                 <thead>

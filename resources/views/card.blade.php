@@ -153,7 +153,6 @@
     </style>
 </head>
 <body>
-
     <!-- KADI YENYEWE -->
     <div class="card-container" id="weddingCard">
         <p class="intro-text">
@@ -163,9 +162,9 @@
         </p>
 
         <div class="names">
-            <h1>Warda Isiaka</h1>
+            <h1>Maiko stephen</h1>
             <div class="and">and</div>
-            <h1>Kelvin Kapele</h1>
+            <h1>Viginia madam</h1>
         </div>
 
         <div class="photo-wrapper">
@@ -183,8 +182,8 @@
 
         <!-- Onyesho la Category ya Mgeni -->
         <div class="guest-category">
-            CATEGORY: <span id="categoryName">VIP GUEST</span>
-        </div>
+    CATEGORY: <span id="categoryName">{{ $pledge->category }}</span>
+</div>
 
         <div class="qr-section">
             <p>for more information scan here</p>
@@ -195,45 +194,66 @@
     <!-- BUTTON YA KUDOWNLOAD KADI -->
     <button class="download-btn" onclick="downloadCard()">Download Card (PNG)</button>
 
-    <script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+   
+   <script>
+    // 1. Data za mgeni kutoka kwenye Laravel
     const guestData = {
-        bride_and_groom: "Warda Isiaka & Kelvin Kapele",
-        guest_name: @json(auth()->user()->name ?? 'John Doe'),
-        category: @json(auth()->user()->category ?? 'VIP GUEST') 
+        bride_and_groom: "Maiko stephen & Viginia madam",
+        guest_name: @json(auth()->user()->name ?? 'Guest'),
+        category: @json($pledge->category ?? 'VIP GUEST')
     };
 
+    // 2. Text itakayokuwa ndani ya QR Code
     const qrText = `WEDDING INVITATION\nCouple: ${guestData.bride_and_groom}\nGuest: ${guestData.guest_name}\nCategory: ${guestData.category}`;
 
-    new QRCode(document.getElementById("qrcode"), {
-        text: qrText,
-        width: 85,
-        height: 85,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
+    // 3. Tengeneza QR Code baada ya DOM kuload kamili
+    document.addEventListener("DOMContentLoaded", function () {
+        const qrElement = document.getElementById("qrcode");
+        
+        if (qrElement) {
+            qrElement.innerHTML = ""; // Safisha eneo la QR
+            
+            new QRCode(qrElement, {
+                text: qrText,
+                width: 85,
+                height: 85,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+        }
     });
 
-    function downloadCard() {
-    const cardElement = document.getElementById("weddingCard");
     
-    // Weka chaguzi sahihi za html2canvas ili kuzuia kukwama kwa picha
-    html2canvas(cardElement, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        logging: true
-    }).then(canvas => {
-        const link = document.createElement("a");
-        link.download = "Wedding_Invitation_Card.png";
-        link.href = canvas.toDataURL("image/png");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }).catch(err => {
-        console.error("Download Error: ", err);
-        alert("Imeshindikana kupakua kadi. Hakikisha picha za kadi zipo kwenye server sahihi.");
-    });
-}
+
+    // 4. Function ya kupakua kadi
+    function downloadCard() {
+        const cardElement = document.getElementById("weddingCard");
+
+        // Subiri kidogo kisha render html2canvas ili kuhakikisha QR code na picha zote ziko tayari
+        setTimeout(() => {
+            html2canvas(cardElement, {
+                scale: 3,             // Kuongeza ubora wa picha (High Quality)
+                useCORS: true,        // Kuruhusu picha za nje kurender
+                allowTaint: false,    // Inazuia picha kuwa na shida ya usalama
+                backgroundColor: null // Inahifadhi rangi na muundo halisi wa background
+            }).then(canvas => {
+                const link = document.createElement("a");
+                link.download = `Wedding_Card_${guestData.guest_name.replace(/\s+/g, '_')}.png`;
+                link.href = canvas.toDataURL("image/png", 1.0);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }).catch(err => {
+                console.error("Download Error: ", err);
+                alert("Imeshindikana kupakua kadi. Tafadhali jaribu tena.");
+            });
+        }, 300); // Timed delay ndogo inahakikisha QR code snapshot inachukuliwa kikamilifu
+    }
 </script>
 
 </body>
