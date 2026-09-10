@@ -203,6 +203,48 @@
            }
             
         }
+
+
+        /* --- CODE MPYA YA POP-UP MENU YA PEMBENI --- */
+.menu li {
+    position: relative; /* Inashikilia pop-up ipae pembeni ya Pledge */
+}
+
+.flyout-menu {
+    position: absolute;
+    top: 0;
+    left: 50%; /* Inasukuma pop-up itokee kulia mwa sidebar */
+    margin-left: 8px; /* Nafasi ndogo kati ya sidebar na pop-up */
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 160px;
+    padding: 6px 0;
+    display: none; /* Inajificha hadi ikibonyezwa */
+    z-index: 999;
+    list-style: none;
+}
+
+.flyout-menu li {
+    margin-bottom: 0 !important;
+}
+
+.flyout-menu a {
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+    color: #444 !important;
+    border-radius: 0 !important;
+    display: block !important;
+    text-decoration: none !important;
+}
+
+.flyout-menu a:hover {
+    background: #fdf8f3 !important;
+    color: #ab6005 !important;
+}
+
+
     </style>
 </head>
 
@@ -231,13 +273,30 @@
                 </a>
             </li>
 
+           <!-- PLEDGE MENU INAYO-POP UP PEMBENI -->
             <li>
+
                 <a href="/pledges" class="active">
+                <a href="javascript:void(0)" onclick="toggleFlyout(event)" class="active">
                     <span class="icon">
                         <img src="{{ asset('icons/pledge.svg')}}" alt="Pledge">
                     </span>
                     <span>Pledge</span>
+                   
                 </a>
+
+                <!-- POP-UP MENU YA PEMBENI (WEKA LINK ZAKO HAPA) -->
+                <ul class="flyout-menu" id="pledgeFlyout">
+                    <li>
+                        <a href="#">Create</a>
+                    </li>
+                    <li>
+                        <a href="/pledge_management">Manage</a>
+                    </li>
+                    <li>
+                        <a href="#">Status</a>
+                    </li>
+                </ul>
             </li>
 
             <li>
@@ -278,6 +337,7 @@
 
         </ul>
 
+
       <div class="logout">
     <a href="{{ route('logout') }}" 
        onclick="event.preventDefault(); if(confirm('Are you sure you want to log out?')) { document.getElementById('logout-form').submit(); }">
@@ -288,7 +348,6 @@
         @csrf
     </form>
 </div>
-
     </aside>
 
 
@@ -338,6 +397,28 @@
     </main>
 
 </div>
+
+<!-- JAVASCRIPT YA POP-UP -->
+<script>
+    function toggleFlyout(event) {
+        event.stopPropagation();
+        const flyout = document.getElementById('pledgeFlyout');
+        
+        if (flyout.style.display === "block") {
+            flyout.style.display = "none";
+        } else {
+            flyout.style.display = "block";
+        }
+    }
+
+    // Ukibonyeza popote nje ya pop-up au ukurasa mwingine, inajificha
+    document.addEventListener('click', function() {
+        const flyout = document.getElementById('pledgeFlyout');
+        if (flyout) {
+            flyout.style.display = "none";
+        }
+    });
+</script>
 
 </body>
 </html>
