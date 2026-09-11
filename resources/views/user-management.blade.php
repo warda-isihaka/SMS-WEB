@@ -33,7 +33,7 @@
         }
 
         table {
-            width: 100%;
+            width: 10%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
@@ -79,94 +79,74 @@
 </head>
 <body>
 
-    <a href="#" class="back-arrow" onclick="window.history.back()">&#8592;</a>
+    <form id="accessForm" action="{{ route('roles.store') }}" method="POST">
+    @csrf
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Accountant</th>
+                <th>Committee</th>
+                <th>None</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($users as $user)
+                <tr>
+                    <td>{{ $user->name }}</td>
+                    <td style="text-align: center;">
+                        <input type="radio" 
+                               name="roles[{{ $user->id }}]" 
+                               value="accountant" 
+                               class="role-radio" 
+                               {{ $user->role_id == 1 ? 'checked' : '' }} 
+                               disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="radio" 
+                               name="roles[{{ $user->id }}]" 
+                               value="committee" 
+                               class="role-radio" 
+                               {{ $user->role_id == 2 ? 'checked' : '' }} 
+                               disabled>
+                    </td>
+                    <td style="text-align: center;">
+                        <input type="radio" 
+                               name="roles[{{ $user->id }}]" 
+                               value="normal user" 
+                               class="role-radio" 
+                               {{ empty($user->role_id) ? 'checked' : '' }}
+                               disabled>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="4" style="text-align: center;">No users found.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
 
-    <div class="container">
-        <div class="title">USER MANAGEMENT SYSTEM</div>
+    <button type="button" id="toggleBtn" class="btn-edit-save" onclick="handleEditSave()">EDIT</button>
+</form>
 
-        <!-- Display success message from controller session -->
-        @if(session('success'))
-            <div class="alert-success">{{ session('success') }}</div>
-        @endif
+<script>
+    let isEditing = false;
 
-        <form id="accessForm" action="{{ route('roles.store') }}" method="POST">
-            @csrf
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Accountant</th>
-                        <th>committee</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Fetch users dynamically from controller -->
-                    @forelse($users ?? [] as $user)
-                        <tr>
-                            <td>{{ $user->name }}</td>
-                            <td style="text-align: center;">
-                                <input type="checkbox" 
-                                       name="roles[{{ $user->id }}][accountant]" 
-                                       class="role-checkbox" 
-                                       {{ method_exists($user, 'hasRole') && $user->hasRole('accountant') ? 'checked' : '' }} 
-                                       disabled>
-                            </td>
-                            <td style="text-align: center;">
-                                <input type="checkbox" 
-                                       name="roles[{{ $user->id }}][committee]" 
-                                       class="role-checkbox" 
-                                       {{ method_exists($user, 'hasRole') && $user->hasRole('committee') ? 'checked' : '' }} 
-                                       disabled>
-                            </td>
-                        </tr>
-                    @empty
-                        <!-- Static fallback rows for preview before database integration -->
-                        <tr>
-                            <td></td>
-                            <td style="text-align: center;">
-                                <input type="checkbox" class="role-checkbox" disabled>
-                            </td>
-                            <td style="text-align: center;">
-                                <input type="checkbox" class="role-checkbox" disabled>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td style="text-align: center;">
-                                <input type="checkbox" class="role-checkbox" checked disabled>
-                            </td>
-                            <td style="text-align: center;">
-                                <input type="checkbox" class="role-checkbox" disabled>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+    function handleEditSave() {
+        const btn = document.getElementById('toggleBtn');
+        const form = document.getElementById('accessForm');
+        const radios = document.querySelectorAll('.role-radio');
 
-            <button type="button" id="toggleBtn" class="btn-edit-save" onclick="handleEditSave()">EDIT</button>
-        </form>
-    </div>
-
-    <script>
-        let isEditing = false;
-
-        function handleEditSave() {
-            const btn = document.getElementById('toggleBtn');
-            const form = document.getElementById('accessForm');
-            const checkboxes = document.querySelectorAll('.role-checkbox');
-
-            if (!isEditing) {
-                // Enable checkboxes to allow editing
-                checkboxes.forEach(cb => cb.disabled = false);
-                isEditing = true;
-                btn.textContent = "Save Changes";
-                btn.style.backgroundColor = "#28a745";
-            } else {
-                // Submit form data to Laravel backend
-                form.submit();
-            }
+        if (!isEditing) {
+            radios.forEach(radio => radio.disabled = false);
+            isEditing = true;
+            btn.textContent = "Save Changes";
+            btn.style.backgroundColor = "#28a745";
+        } else {
+            form.submit();
         }
-    </script>
-
+    }
+</script>
 </body>
 </html>

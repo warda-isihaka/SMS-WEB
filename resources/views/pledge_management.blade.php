@@ -76,7 +76,7 @@
             margin-top: 30px;
         }
 
-        .btn-toggle {
+       button, .btn-toggle {
             background-color: brown;
             color: #fff;
             border: none;
@@ -137,12 +137,11 @@
         </table>
     </div>
 
-    <!-- Kitufe kitatokea iwapo tu aliyelogin ni Accountant -->
-@if(auth()->user() && auth()->user()->role === 'accountant')
+    
     <div class="btn-container">
         <button id="editBtn" class="btn-action" onclick="toggleEdit()">Edit</button>
     </div>
-@endif
+
 
     <script>
         let isEditing = false;

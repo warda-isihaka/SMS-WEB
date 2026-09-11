@@ -40,9 +40,7 @@
 <body class="bg-gray-100 flex flex-col items-center min-h-screen p-6">
 
     <!-- Header / Title -->
-    <div class="w-full max-w-4xl mt-6 mb-4">
-        <h1 class="text-xl font-bold text-gray-400 uppercase tracking-wide">VIEW STATUS FORM</h1>
-    </div>
+    
 
     <!-- Main Card -->
     <div class="status-card shadow-lg">

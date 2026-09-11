@@ -292,7 +292,7 @@
                         <a href="/pledge_management">Manage</a>
                     </li>
                     <li>
-                        <a href="{{ route('pledge_status') }}">Status</a>
+                        <a href="/status">Status</a>
                     </li>
                 </ul>
             </li>
@@ -325,6 +325,7 @@
             </li>
 
             <li>
+                 
                <a href="/user-management" class="active">
                     <span class="icon">
                         <img src="{{ asset('icons/settings.svg')}}" alt="Settings">

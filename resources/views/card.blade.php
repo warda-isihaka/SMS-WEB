@@ -181,8 +181,8 @@
         </div>
 
         <!-- Onyesho la Category ya Mgeni -->
-        <div class="guest-category">
-    CATEGORY: <span id="categoryName">{{ $pledge->category }}</span>
+      <div class="guest-category">
+    CATEGORY: <span id="categoryName">{{ auth()->user()->pledge?->category ?? 'PENDING' }}</span>
 </div>
 
         <div class="qr-section">
@@ -200,11 +200,11 @@
    
    <script>
     // 1. Data za mgeni kutoka kwenye Laravel
-    const guestData = {
-        bride_and_groom: "Maiko stephen & Viginia madam",
-        guest_name: @json(auth()->user()->name ?? 'Guest'),
-        category: @json($pledge->category ?? 'VIP GUEST')
-    };
+   const guestData = {
+    bride_and_groom: "Maiko stephen & Viginia madam",
+    guest_name: @json(auth()->user()->name ?? 'Guest'),
+    category: @json(auth()->user()->pledge?->category ?? 'PENDING')
+};
 
     // 2. Text itakayokuwa ndani ya QR Code
     const qrText = `WEDDING INVITATION\nCouple: ${guestData.bride_and_groom}\nGuest: ${guestData.guest_name}\nCategory: ${guestData.category}`;

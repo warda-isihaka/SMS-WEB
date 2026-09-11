@@ -92,7 +92,7 @@
             </div>
         @endif
 
-        <form action="{{ route('store') }}" method="POST">
+        <form action="{{ route('pledges.store') }}" method="POST">
             @csrf
 
             <!-- Category Section -->

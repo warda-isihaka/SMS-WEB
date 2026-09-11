@@ -48,4 +48,24 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Role::class);
     }
+
+    public function pledge()
+    {
+        return $this->hasOne(Pledge::class, 'user_id');
+    }
+
+    public function isAdmin()
+    {
+        return $this->role_id == 1; // 1 ni Admin
+    }
+
+    public function isAccountant()
+    {
+        return $this->role_id == 2; // 2 ni Mhasibu
+    }
+
+    public function isCommittee()
+    {
+        return $this->role_id == 3; // 3 ni Kamati
+    }
 }
