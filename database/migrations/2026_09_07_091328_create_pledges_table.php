@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('pledges', function (Blueprint $table) {
             $table->id('pledge_id');
-            $table->foreignId('user_id')->nullable()->constrained('users', 'user_id')->onDelete('cascade');
+$table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->string('category')->nullable();
             $table->decimal('amount', 10, 2)->default(0);
             $table->decimal('paid', 10, 2)->default(0);

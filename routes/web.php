@@ -24,11 +24,6 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [dashboardcontroller::class, 'index'])->name('dashboard');
 
-    // Announcements
-    Route::get('/announcements/create', [announcementcontroller::class, 'create'])->middleware('admin')->name('announcements.create.admin');
-    Route::get('/announcement', [announcementcontroller::class, 'create'])->name('announcement.create');
-    Route::post('/announcement', [announcementcontroller::class, 'store'])->name('announcement.store');
-
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -62,6 +57,11 @@ Route::get('/card', [PledgeController::class, 'showCard'])->name('card.index');
     // 2. Inahifadhi Paid na Remain pindi unapobonyeza Update
     Route::post('/pledge/update-paid-remain', [PledgeController::class, 'updateStatusAndPaid'])->name('pledge.updateStatusAndPaid');
 
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/announcement', [AnnouncementController::class, 'create'])->name('announcement.create');
+    Route::post('/announcement', [AnnouncementController::class, 'store'])->name('announcement.store');
 });
 
 // Logout Route

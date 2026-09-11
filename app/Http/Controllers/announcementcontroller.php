@@ -28,6 +28,7 @@ class announcementcontroller extends Controller
             
             'content' => $request->content,
              'date' => $request->date,
+             'user_id' => auth()->id(),
         ]);
 
         return redirect()->route('announcement.create')->with('success', 'Announcement posted successfully!');

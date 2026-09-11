@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('roles', function (Blueprint $table) {
          $table->id();
-        $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Inaunganisha na users table
-        $table->string('role'); // Role ya mtumiaji (mfano: Admin, Manager, User)
+         $table->string('name');
         $table->timestamps();
         });
     }

@@ -350,7 +350,7 @@
         <div class="topbar">
 
             <div class="welcome">
-                Welcome, user
+                Welcome, {{ auth()->user()->name }}
             </div>
 
             <div class="top-icons">
