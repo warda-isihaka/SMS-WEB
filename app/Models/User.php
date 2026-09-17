@@ -50,9 +50,14 @@ class User extends Authenticatable
      */
     public function role()
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsTo(Role::class, 'role_id');
     }
 
+   
+     public function canViewBudget(): bool
+{
+    return $this->role && in_array(strtolower($this->role->name), ['admin', 'accountant', 'committee']);
+}
     /**
      * Relationship: User's pledge
      */
@@ -84,4 +89,6 @@ class User extends Authenticatable
     {
         return $this->role && strtolower($this->role->name) === 'committee';
     }
+
+   
 }

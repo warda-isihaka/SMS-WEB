@@ -288,24 +288,29 @@
                     <li>
                         <a href="/create">Create</a>
                     </li>
+
+                    <!-- MANAGE LINK: Accountant Only -->
+        @if(Auth::check() && Auth::user()->isAccountant())
                     <li>
                         <a href="/pledge_management">Manage</a>
                     </li>
+        @endif
                     <li>
                         <a href="/status">Status</a>
                     </li>
                 </ul>
             </li>
 
-            <li>
-                <a href="/budget" class="active">
-                    <span class="icon">
-                        <img src="{{ asset('icons/budget.svg')}}" alt="Budget">
-                    </span>
-                    <span>Budget</span>
-                </a>
-            </li>
-
+            @if(Auth::check() && Auth::user()->canViewBudget())
+<li>
+    <a href="/budget" class="active">
+        <span class="icon">
+            <img src="{{ asset('icons/budget.svg') }}" />
+        </span>
+        <span>Budget</span>
+    </a>
+</li>
+@endif
             <li>
                 <a href="/card" class="active">
                     <span class="icon">
@@ -315,24 +320,29 @@
                 </a>
             </li>
 
-            <li>
-                <a href="{{ route('announcement.create') }}" class="active">
-                    <span class="icon">
-                        <img src="{{ asset('icons/announcement.svg')}}" alt="Announcement">
-                        </span>
-                    <span>Announcement</span>
-                </a>
-            </li>
+           <!-- ANNOUNCEMENT MENU ITEM: Admin Only -->
+@if(Auth::check() && Auth::user()->isAdmin())
+<li>
+    <a href="/announcement">
+        <span class="icon">
+            <img src="{{ asset('icons/announcement.svg') }}" />
+        </span>
+        <span>Announcement</span>
+    </a>
+</li>
+@endif
 
-            <li>
-                 
-               <a href="/user-management" class="active">
-                    <span class="icon">
-                        <img src="{{ asset('icons/settings.svg')}}" alt="Settings">
-                    </span>
-                    <span>Settings</span>
-                </a>
-            </li>
+<!-- SETTINGS MENU ITEM: Admin Only -->
+@if(Auth::check() && Auth::user()->isAdmin())
+<li>
+    <a href="/user-management">
+        <span class="icon">
+            <img src="{{ asset('icons/settings.svg') }}" />
+        </span>
+        <span>Settings</span>
+    </a>
+</li>
+@endif
 
         </ul>
 

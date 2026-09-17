@@ -70,6 +70,7 @@
             <br>
 
             <!-- Action Buttons -->
+             @if(Auth::check() && Auth::user()->isAccountant())
             <div class="flex items-center space-x-6 mb-6">
                 <button type="button" onclick="toggleAddRow()" class="flex items-center space-x-2 text-sm font-medium text-gray-800 hover:text-amber-800">
                     <span class="bg-amber-800 text-white w-5 h-5 flex items-center justify-center font-bold text-xs">+</span>
@@ -79,6 +80,7 @@
                     <span id="removeIcon" class="bg-amber-800 text-white w-5 h-5 flex items-center justify-center font-bold text-xs">-</span>
                     <span id="removeBtnText">Remove needs</span>
                 </button>
+                @endif
             </div>
 
             <!-- Delete Action Area -->

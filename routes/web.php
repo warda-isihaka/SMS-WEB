@@ -39,6 +39,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('budget.index');
 
     // Pledges
+Route::resource('pledges', PledgeController::class);
     Route::get('/create', [PledgeController::class, 'create'])->name('create');
     Route::post('/create', [PledgeController::class, 'store'])->name('store');
 

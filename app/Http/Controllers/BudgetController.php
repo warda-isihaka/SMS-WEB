@@ -10,6 +10,10 @@ class BudgetController extends Controller
 {
     public function index()
     {
+        if (!auth()->check() || !auth()->user()->canViewBudget()) {
+        abort(403, 'Unauthorized access to Budget.');
+    }
+    
         // 1. Chukua mahitaji yote ya budget kutoka kwenye database
         $needs = Budget::all();
 

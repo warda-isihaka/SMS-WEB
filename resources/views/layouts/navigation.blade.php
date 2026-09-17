@@ -82,6 +82,13 @@
                     {{ __('Settings') }}
                 </x-responsive-nav-link>
             @endif
+
+            {{-- Hides the Budget menu option from regular users --}}
+@if(Auth::check() && Auth::user()->canViewBudget())
+    <x-nav-link :href="route('budget.index')" :active="request()->routeIs('budget.*')">
+        {{ __('Budget') }}
+    </x-nav-link>
+@endif
         </div>
 
         <!-- Responsive Settings Options -->

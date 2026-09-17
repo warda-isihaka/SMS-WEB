@@ -97,4 +97,13 @@ class PledgeController extends Controller
 
     return view('card', compact('pledge'));
 }
+
+public function manage()
+{
+    if (!auth()->check() || !auth()->user()->isAccountant()) {
+        abort(403, 'Unauthorized access to Pledge Management.');
+    }
+
+    return view('pledge_management');
+}
 }
