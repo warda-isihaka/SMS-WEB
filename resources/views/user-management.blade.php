@@ -84,10 +84,10 @@
     <table>
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Accountant</th>
-                <th>Committee</th>
-                <th>None</th>
+                <th>name</th>
+                <th>accountant</th>
+                <th>committee</th>
+                <th>none</th>
             </tr>
         </thead>
         <tbody>
@@ -99,24 +99,22 @@
                                name="roles[{{ $user->id }}]" 
                                value="accountant" 
                                class="role-radio" 
-                               {{ $user->role_id == 1 ? 'checked' : '' }} 
-                               disabled>
+                              {{ $user->role && strtolower($user->role->name) === 'accountant' ? 'checked' : '' }}>
                     </td>
+                          
                     <td style="text-align: center;">
                         <input type="radio" 
                                name="roles[{{ $user->id }}]" 
                                value="committee" 
                                class="role-radio" 
-                               {{ $user->role_id == 2 ? 'checked' : '' }} 
-                               disabled>
-                    </td>
+                              {{ $user->role && strtolower($user->role->name) === 'committee' ? 'checked' : '' }} 
+                    <td>
                     <td style="text-align: center;">
                         <input type="radio" 
                                name="roles[{{ $user->id }}]" 
-                               value="normal user" 
+                               value="none" 
                                class="role-radio" 
-                               {{ empty($user->role_id) ? 'checked' : '' }}
-                               disabled>
+                               {{ !$user->role || !in_array(strtolower($user->role->name), ['accountant', 'committee']) ? 'checked' : '' }}>
                     </td>
                 </tr>
             @empty

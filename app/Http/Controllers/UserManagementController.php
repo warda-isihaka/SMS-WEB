@@ -16,6 +16,10 @@ class UserManagementController extends Controller
     // 1. Onyesha ukurasa na uvute watumiaji pamoja na role_id zao
     public function index()
     {
+        if (!auth()->check() || !auth()->user()->isAdmin()) {
+            abort(403, 'Unauthorized action.');
+        }
+        
         $users = User::all();
         return view('user-management', compact('users'));
     }
@@ -23,32 +27,30 @@ class UserManagementController extends Controller
     // 2. Hifadhi au sasisha role moja tu kwa kila mtumiaji kwenye column ya role_id
     public function update(Request $request)
     {
+        
         $rolesData = $request->input('roles', []);
 
-        // Chukua ID za roles kutoka kwenye database kulingana na majina yake
-        $accountantRole = Role::where('name', 'accountant')->first();
-        $committeeRole  = Role::where('name', 'committee')->first();
+     // Automatically retrieve or create the roles in the database
+$accountantRole = Role::firstOrCreate(['name' => 'accountant']);
+$committeeRole  = Role::firstOrCreate(['name' => 'committee']);
+$adminRole = Role::firstOrCreate(['name' => 'admin']);
 
-        $accountantId = $accountantRole ? $accountantRole->id : 1;
-        $committeeId  = $committeeRole ? $committeeRole->id : 2;
+$roleMap = [
+    'admin'      => $adminRole->id,
+    'accountant' => $accountantRole->id,
+    'committee'  => $committeeRole->id,
+    'none'       => null,
+];
 
-        $roleMap = [
-            'accountant' => $accountantId,
-            'committee'  => $committeeId,
-            'normal user' => null,
-        ];
+foreach ($rolesData as $userId => $selectedRole) {
+    $user = User::find($userId);
+    $key = strtolower(trim($selectedRole));
 
-        // Pitia data zilizotumwa kutoka kwenye Radio Buttons za fomu
-        foreach ($rolesData as $userId => $selectedRole) {
-            $user = User::find($userId);
-
-            if ($user) {
-                // Kama ulichagua 'none', role_id inakuwa NULL, vinginevyo inachukua ID ya role husika
-                $user->role_id = $roleMap[$selectedRole] ?? null;
-                $user->save();
-            }
-        }
-
+    if ($user && array_key_exists($key, $roleMap)) {
+        $user->role_id = $roleMap[$key];
+        $user->save();
+    }
+}
         return redirect()->back()->with('success', 'Taarifa za majukumu zimehifadhiwa kikamilifu!');
     }
 }

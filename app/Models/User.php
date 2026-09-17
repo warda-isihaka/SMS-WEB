@@ -44,28 +44,44 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-    public function roles()
+
+    /**
+     * Relationship: A User belongs to a Role
+     */
+    public function role()
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsTo(Role::class);
     }
 
+    /**
+     * Relationship: User's pledge
+     */
     public function pledge()
     {
-        return $this->hasOne(Pledge::class, 'user_id');
+        return $this->hasOne(Pledge::class);
     }
 
-    public function isAdmin()
+    /**
+     * Helper: Check if user has 'admin' role dynamically by role name
+     */
+    public function isAdmin(): bool
     {
-        return $this->role_id == 1; // 1 ni Admin
+        return $this->role && strtolower($this->role->name) === 'admin';
     }
 
-    public function isAccountant()
+    /**
+     * Helper: Check if user has 'accountant' role dynamically by role name
+     */
+    public function isAccountant(): bool
     {
-        return $this->role_id == 2; // 2 ni Mhasibu
+        return $this->role && strtolower($this->role->name) === 'accountant';
     }
 
-    public function isCommittee()
+    /**
+     * Helper: Check if user has 'committee' role dynamically by role name
+     */
+    public function isCommittee(): bool
     {
-        return $this->role_id == 3; // 3 ni Kamati
+        return $this->role && strtolower($this->role->name) === 'committee';
     }
 }
