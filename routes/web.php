@@ -5,8 +5,11 @@ use App\Http\Controllers\dashboardcontroller;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\PledgeController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -58,11 +61,16 @@ Route::get('/card', [PledgeController::class, 'showCard'])->name('card.index');
     // 2. Inahifadhi Paid na Remain pindi unapobonyeza Update
     Route::post('/pledge/update-paid-remain', [PledgeController::class, 'updateStatusAndPaid'])->name('pledge.updateStatusAndPaid');
 
+    Route::get('/events/select/{id}', [EventController::class, 'selectEvent'])->name('events.select');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/announcement', [AnnouncementController::class, 'create'])->name('announcement.create');
     Route::post('/announcement', [AnnouncementController::class, 'store'])->name('announcement.store');
+Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+
+Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
+Route::post('/events', [EventController::class, 'store'])->name('events.store');
 });
 
 // Logout Route
@@ -74,3 +82,7 @@ Route::get('/logout', function () {
 })->name('logout');
 
 require __DIR__.'/auth.php';
+
+
+
+

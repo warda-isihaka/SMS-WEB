@@ -25,7 +25,7 @@ class announcementcontroller extends Controller
         ]);
 
         announcement::create([
-            
+            'event_id' => session('active_event_id'),
             'content' => $request->content,
              'date' => $request->date,
              'user_id' => auth()->id(),

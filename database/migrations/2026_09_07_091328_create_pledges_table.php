@@ -18,6 +18,7 @@ $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascad
             $table->string('payment_method')->nullable();
             $table->string('status')->default('pending');
             $table->timestamps();
+           
         });
     }
 

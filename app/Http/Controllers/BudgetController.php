@@ -12,10 +12,10 @@ class BudgetController extends Controller
     {
         if (!auth()->check() || !auth()->user()->canViewBudget()) {
         abort(403, 'Unauthorized access to Budget.');
+        $eventId = session('active_event_id');
+        $needs = Budget::where('event_id', $eventId)->get();
     }
     
-        // 1. Chukua mahitaji yote ya budget kutoka kwenye database
-        $needs = Budget::all();
 
         // 2. Hesabu jumla ya kiasi cha mahitaji zote (Needs Total Amount)
         $totalNeedsAmount = Budget::sum('amount');
@@ -35,6 +35,7 @@ class BudgetController extends Controller
 
         Budget::create([
             'user_id' => auth()->id() ?? 1,
+            'event_id' => session('active_event_id'),
             'amount'  => $request->amount,
         ]);
 

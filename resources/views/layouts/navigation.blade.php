@@ -15,14 +15,10 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    {{-- Settings Link: Visible ONLY to Admins --}}
-                    @if(Auth::check() && Auth::user()->isAdmin())
-                        <x-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.*')">
-                            {{ __('Settings') }}
-                        </x-nav-link>
-                    @endif
+
                 </div>
-            </div>
+            
+            
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -100,7 +96,12 @@
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                   
+                <x-slot name="content">
+    <!-- Profile Link -->
+    <x-dropdown-link :href="route('profile.edit')">
+        {{ __('Profile') }}
+    </x-dropdown-link>
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->

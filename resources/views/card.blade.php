@@ -216,13 +216,13 @@
    <script>
     // 1. Data za mgeni kutoka kwenye Laravel
    const guestData = {
-    bride_and_groom: "Maiko stephen & Viginia madam",
-    guest_name: @json(auth()->user()->name ?? 'Guest'),
-    category: @json(auth()->user()->pledge?->category ?? 'PENDING')
+    qr_code: @json(auth()->user()->pledge?->qr_code ?? 'PENDING'),
+   
 };
-
+        
     // 2. Text itakayokuwa ndani ya QR Code
-    const qrText = `WEDDING INVITATION\nCouple: ${guestData.bride_and_groom}\nGuest: ${guestData.guest_name}\nCategory: ${guestData.category}`;
+     const qrText = guestData.qr_code;
+
 
     // 3. Tengeneza QR Code baada ya DOM kuload kamili
     document.addEventListener("DOMContentLoaded", function () {
@@ -231,7 +231,7 @@
         if (qrElement) {
             qrElement.innerHTML = ""; // Safisha eneo la QR
             
-            new QRCode(qrElement, {
+            new QRCode(document.getElementById("qrcode"), {
                 text: qrText,
                 width: 85,
                 height: 85,
@@ -258,7 +258,7 @@
                 backgroundColor: null // Inahifadhi rangi na muundo halisi wa background
             }).then(canvas => {
                 const link = document.createElement("a");
-                link.download = `Wedding_Card_${guestData.guest_name.replace(/\s+/g, '_')}.png`;
+                link.download = `Wedding_Card_${guestData.qr_code.replace(/\s+/g, '_')}.png`;
                 link.href = canvas.toDataURL("image/png", 1.0);
                 document.body.appendChild(link);
                 link.click();
@@ -267,7 +267,7 @@
                 console.error("Download Error: ", err);
                 alert("Imeshindikana kupakua kadi. Tafadhali jaribu tena.");
             });
-        }, 300); // Timed delay ndogo inahakikisha QR code snapshot inachukuliwa kikamilifu
+        }, 1000); // Timed delay ndogo inahakikisha QR code snapshot inachukuliwa kikamilifu
     }
 </script>
 

@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('announcements', function (Blueprint $table) {
-            $table->id();
-            $table->text('content');
-            $table->date('date');
-            $table->timestamps();
-          
+        Schema::table('pledges', function (Blueprint $table) {
+            $table->boolean('is_scanned')->default(false)->after('status');
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('announcements');
+        Schema::table('pledges', function (Blueprint $table) {
+            $table->dropColumn('is_scanned');
+        });
     }
 };

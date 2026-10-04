@@ -28,6 +28,7 @@ class PledgeController extends Controller
 
         Pledge::create([
             'user_id'  => auth()->id(),
+            'event_id' => session('active_event_id'),
             'category' => $request->category,
             'amount'   => $request->amount,
             'paid'     => 0,
@@ -37,11 +38,13 @@ class PledgeController extends Controller
 
         return redirect()->back()->with('success', 'Ahadi yako imerekodiwa kikamilifu!');
     }
+    
 
     // 3. ONGEZA HII: Inaonyesha ukurasa wa status wa user aliyelogin
     public function showStatus()
     {
-        $pledges = Pledge::where('user_id', auth()->id())->get();
+        $activeEventId = session('active_event_id');
+        $pledges = Pledge::where('user_id', auth()->id())->where('event_id', $activeEventId)->get();
         return view('status', compact('pledges'));
     }
 
@@ -49,8 +52,9 @@ class PledgeController extends Controller
     public function searchStatus(Request $request)
     {
         $search = $request->input('search');
+        $activeEventId = session('active_event_id');
 
-        $pledges = Pledge::whereHas('user', function ($q) use ($search) {
+        $pledges = Pledge::where('event_id', $activeEventId)->whereHas('user', function ($q) use ($search) {
             $q->where('phone', 'like', "%{$search}%")
               ->orWhere('name', 'like', "%{$search}%");
         })->get();
@@ -61,7 +65,8 @@ class PledgeController extends Controller
     // 5. Admin: Ukurasa wa usimamizi
     public function pledgeManagement()
     {
-        $pledges = Pledge::with('user')->get();
+        $activeEventId = session('active_event_id');
+        $pledges = Pledge::where('event_id', $activeEventId)->with('user')->get();
         return view('pledge_management', compact('pledges'));
     }
 
@@ -93,7 +98,7 @@ class PledgeController extends Controller
         public function showCard()
 {
     // Inavuta ahadi ya hivi karibuni ya user aliyelogin
-    $pledge = Pledge::where('user_id', auth()->id())->latest()->first();
+    $pledge = Pledge::where('user_id', auth()->id()) ->where('event_id', session('active_event_id')) ->latest()->first();
 
     return view('card', compact('pledge'));
 }

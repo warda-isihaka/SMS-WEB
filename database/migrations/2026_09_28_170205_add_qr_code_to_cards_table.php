@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('announcements', function (Blueprint $table) {
-            $table->id();
-            $table->text('content');
-            $table->date('date');
-            $table->timestamps();
-          
+        Schema::table('pledges', function (Blueprint $table) {
+            $table->string('qr_code')->unique()->nullable();
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('announcements');
+        Schema::table('pledges', function (Blueprint $table) {
+            $table->dropColumn('qr_code');
+        });
     }
 };

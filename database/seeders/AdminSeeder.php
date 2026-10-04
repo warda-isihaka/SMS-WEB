@@ -20,12 +20,12 @@ class AdminSeeder extends Seeder
 
         if ($adminRole) {
             // 2. Create or update the Admin user
-            User::firstOrCreate(
+            User::updateOrCreate(
                 ['email' => 'admin@example.com'], // Unique identifier
                 [
                     'name'     => 'System Admin',
                     'password' => Hash::make('password123'), // Replace with your secure password
-                    'role_id'  => $adminRole->id,
+                    'role_id'  => $adminRole ? $adminRole->id : 1,
                 ]
             );
         }

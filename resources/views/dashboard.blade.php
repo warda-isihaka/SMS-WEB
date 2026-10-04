@@ -262,6 +262,8 @@
             <span >SMS</span>
         </div>
 
+        
+
         <ul class="menu">
 
             <li>
@@ -360,9 +362,53 @@
 
         <div class="topbar">
 
-            <div class="welcome">
-                Welcome, {{ auth()->user()->name }}
+            <div class="welcome"><div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+    
+    <!-- Active Event Selector -->
+    <div class="d-flex align-items-center gap-2">
+        <label for="eventSelect" class="fw-bold text-secondary mb-0" style="font-size: 0.9rem;">
+            <i class="bi bi-calendar-event me-1"></i> Event:
+        </label>
+        
+        <form action="{{ route('events.select', '') }}" method="GET" id="eventSwitcherForm" class="m-0">
+            @csrf
+            <select name="event_id" 
+                    id="eventSelect"
+                    class="form-select form-select-sm shadow-sm" 
+                    style="min-width: 200px; border-color: #ab6005; color: #333; font-weight: 600;"
+                    onchange="if(this.value) { this.form.action='{{ url('events/select') }}/' + this.value; this.form.submit(); }">
+                <option value="" disabled {{ !session('active_event_id') ? 'selected' : '' }}>-- Select Event --</option>
+                @foreach($events as $event)
+                    <option value="{{ $event->id }}" {{ session('active_event_id') == $event->id ? 'selected' : '' }}>
+                        {{ $event->title }}
+                    </option>
+                @endforeach
+            </select>
+
+        </form>
+        @if(Auth::check() && Auth::user()->isAdmin())
+            <a href="{{ route('events.create') }}" 
+               style="display: inline-block; background-color: #ab6005; color: #ffffff; padding: 6px 14px; font-weight: 600; font-size: 0.875rem; text-decoration: none; border-radius: 6px; margin-left: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); transition: background-color 0.2s ease;"
+               onmouseover="this.style.backgroundColor='#9e5801';"
+               onmouseout="this.style.backgroundColor='#ab6005';">
+                + New Event
+            </a>
+        @endif
+    </div>
+
+    <!-- User Greeting & Profile Icons -->
+    <div class="d-flex align-items-center gap-3">
+        <h5 class="m-0 fw-bold" style="color: #ab6005;">Welcome, {{ Auth::user()->name }}</h5>
+        <div class="d-flex gap-2 text-secondary fs-5 ms-2">
+            <i class="bi bi-chat-text cursor-pointer"></i>
+            <i class="bi bi-bell cursor-pointer"></i>
+            <i class="bi bi-person-circle cursor-pointer"></i>
+        </div>
+    </div>
+
+</div>
             </div>
+            
 
             <div class="top-icons">
                 <span class="icon">
@@ -372,8 +418,10 @@
                     <img src="{{ asset('icons/notifications.svg')}}" alt="Notifications">
                 </span>
                 <span class="icon">
-                    <img src="{{ asset('icons/profile.svg')}}" alt="Profile">
-                </span>
+    <a href="{{ route('profile.edit') }}" title="Profile Settings">
+        <img src="{{ asset('icons/profile.svg') }}" alt="Profile">
+    </a>
+</span>
             </div>
 
         </div>
