@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Budget;
 use App\Models\Pledge;
+use app\Models\Event;
 
 class BudgetController extends Controller
 {

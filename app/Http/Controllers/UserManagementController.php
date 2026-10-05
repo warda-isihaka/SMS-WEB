@@ -9,41 +9,43 @@ use Illuminate\Support\Facades\DB;
 
 class UserManagementController extends Controller
 {
+    public function index()
+    {
+        $eventId = session('active_event_id');
+
+        // Retrieve all users
+        $users = User::all();
+
+        // Get roles assigned to users for the current active event
+        $userRoles = [];
+        if ($eventId) {
+            $userRoles = DB::table('event_user')
+                ->where('event_id', $eventId)
+                ->pluck('role_id', 'user_id')
+                ->toArray();
+        }
+
+        $roles = Role::all();
+
+        return view('user-management', compact('users', 'userRoles', 'roles'));
+    }
+    
     public function store(Request $request)
     {
         return $this->update($request);
     }
 
     // 1. Onyesha ukurasa na uvute watumiaji pamoja na role zao za active event
-    public function index()
-    {
-        if (!auth()->check() || !auth()->user()->isAdmin()) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $eventId = session('active_event_id');
-
-        // Fetch users along with their assigned role for the currently active event
-        $users = User::all()->map(function ($user) use ($eventId) {
-            $eventRole = DB::table('event_user')
-                ->where('event_id', $eventId)
-                ->where('user_id', $user->id)
-                ->value('role_id');
-
-            // Fallback to default user role_id if no event-specific role exists
-            $user->role_id = $eventRole ?? $user->role_id;
-            return $user;
-        });
-
-        return view('user-management', compact('users'));
-    }
-
+  
     // 2. Hifadhi au sasisha role ya mtumiaji kwa ACTIVE EVENT pekee
     public function update(Request $request)
     {
         $rolesData = $request->input('roles', []);
         $eventId = session('active_event_id');
 
+        if (!$eventId) {
+            return redirect()->back()->with('error', 'Tafadhali chagua event kwanza.');
+        }
         // Automatically retrieve or create the roles in the database
         $accountantRole = Role::firstOrCreate(['name' => 'accountant']);
         $committeeRole  = Role::firstOrCreate(['name' => 'committee']);
@@ -62,19 +64,27 @@ class UserManagementController extends Controller
 
             if ($user && array_key_exists($key, $roleMap)) {
                 $roleId = $roleMap[$key];
-
+if ($roleId === null) {
+                    // Remove role for this event if 'none' is selected
+                    DB::table('event_user')
+                        ->where('event_id', $eventId)
+                        ->where('user_id', $userId)
+                        ->delete();
+                } else {
+                    // Update or insert into event_user pivot table for the active event
+                    DB::table('event_user')->updateOrInsert(
+                        [
+                            'event_id' => $eventId,
+                            'user_id'  => $userId,
+                        ],
+                        [
+                            'role_id'    => $roleId,
+                            'updated_at' => now(),
+                            'created_at' => now(),
+                        ]
+                    );
+                }
                 // Update or insert into event_user pivot table for the active event
-                DB::table('event_user')->updateOrInsert(
-                    [
-                        'event_id' => $eventId,
-                        'user_id'  => $userId,
-                    ],
-                    [
-                        'role_id'    => $roleId,
-                        'updated_at' => now(),
-                        'created_at' => now(),
-                    ]
-                );
             }
         }
 

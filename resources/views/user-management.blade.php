@@ -64,10 +64,13 @@
             font-size: 16px;
             cursor: pointer;
             border-radius: 2px;
+           
         }
 
         .btn-edit-save:hover {
             background-color: #b06f28;
+                        onmouseover="this.style.opacity='0.9'" 
+                      onmouseout="this.style.opacity='1'
         }
 
         .alert-success {
@@ -77,74 +80,90 @@
         }
     </style>
 </head>
-<body>
+<body><x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            User Management
+        </h2>
+    </x-slot>
 
-    <form id="accessForm" action="{{ route('roles.store') }}" method="POST">
-    @csrf
-    <table>
-        <thead>
-            <tr>
-                <th>name</th>
-                <th>accountant</th>
-                <th>committee</th>
-                <th>none</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($users as $user)
-                <tr>
-                    <td>{{ $user->name }}</td>
-                    <td style="text-align: center;">
-                        <input type="radio" 
-                               name="roles[{{ $user->id }}]" 
-                               value="accountant" 
-                               class="role-radio" 
-                              {{ $user->role && strtolower($user->role->name) === 'accountant' ? 'checked' : '' }}>
-                    </td>
-                          
-                    <td style="text-align: center;">
-                        <input type="radio" 
-                               name="roles[{{ $user->id }}]" 
-                               value="committee" 
-                               class="role-radio" 
-                              {{ $user->role && strtolower($user->role->name) === 'committee' ? 'checked' : '' }} 
-                    <td>
-                    <td style="text-align: center;">
-                        <input type="radio" 
-                               name="roles[{{ $user->id }}]" 
-                               value="none" 
-                               class="role-radio" 
-                               {{ !$user->role || !in_array(strtolower($user->role->name), ['accountant', 'committee']) ? 'checked' : '' }}>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="4" style="text-align: center;">No users found.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="container py-4">
+        <!-- Display Alert Messages -->
+        @if(session('success'))
+            <div class="alert alert-success mb-3">
+                {{ session('success') }}
+            </div>
+        @endif
 
-    <button type="button" id="toggleBtn" class="btn-edit-save" onclick="handleEditSave()">EDIT</button>
-</form>
+        @if(session('error'))
+            <div class="alert alert-danger mb-3">
+                {{ session('error') }}
+            </div>
+        @endif
 
-<script>
-    let isEditing = false;
+        <form id="accessForm" action="{{ route('user-management.update') }}" method="POST">
+            @csrf
+            
+            <table class="table table-bordered bg-white shadow-sm">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th class="text-center">Accountant</th>
+                        <th class="text-center">Committee</th>
+                        <th class="text-center">None</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($users as $user)
+                        @php
+                            // Fetch user's role ID for the currently active event
+                            $userRoleId = $userRoles[$user->id] ?? null;
+                            $accountantRoleId = $roles->where('name', 'accountant')->first()->id ?? null;
+                            $committeeRoleId  = $roles->where('name', 'committee')->first()->id ?? null;
+                        @endphp
+                        <tr>
+                            <td>{{ $user->name }}</td>
 
-    function handleEditSave() {
-        const btn = document.getElementById('toggleBtn');
-        const form = document.getElementById('accessForm');
-        const radios = document.querySelectorAll('.role-radio');
+                            <!-- Accountant Role -->
+                            <td style="text-align: center;">
+                                <input type="radio" 
+                                       name="roles[{{ $user->id }}]" 
+                                       value="accountant" 
+                                       class="role-radio" 
+                                       {{ $userRoleId == $accountantRoleId ? 'checked' : '' }}>
+                            </td>
 
-        if (!isEditing) {
-            radios.forEach(radio => radio.disabled = false);
-            isEditing = true;
-            btn.textContent = "Save Changes";
-            btn.style.backgroundColor = "#28a745";
-        } else {
-            form.submit();
-        }
-    }
-</script>
+                            <!-- Committee Role -->
+                            <td style="text-align: center;">
+                                <input type="radio" 
+                                       name="roles[{{ $user->id }}]" 
+                                       value="committee" 
+                                       class="role-radio" 
+                                       {{ $userRoleId == $committeeRoleId ? 'checked' : '' }}>
+                            </td>
+
+                            <!-- None -->
+                            <td style="text-align: center;">
+                                <input type="radio" 
+                                       name="roles[{{ $user->id }}]" 
+                                       value="none" 
+                                       class="role-radio" 
+                                       {{ is_null($userRoleId) ? 'checked' : '' }}>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center">No users found.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+
+            <button type="submit" class="btn-edit-save fw-bold  px-4 py-2 mt-3 rounded shadow-sm border-0"">
+                EDIT
+            </button>
+        </form>
+    </div>
+</x-app-layout>
 </body>
 </html>

@@ -33,7 +33,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // User Management
-    Route::get('/user-management', [UserManagementController::class, 'index'])->name('user-management');
+    Route::get('/user-management', [UserManagementController::class, 'index'])->name('user-management.index');
+    Route::post('/user-management', [UserManagementController::class, 'update'])->name('user-management.update');
     Route::post('/user-management/save', [UserManagementController::class, 'store'])->name('roles.store');
 
     // Budget

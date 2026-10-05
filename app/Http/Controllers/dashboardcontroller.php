@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\announcement;
-
+use App\Models\Event;
 class dashboardcontroller extends Controller
 {
    public function index()
 {
+    $user = auth()->user();
+    $events = Event::all(); // Fetch all events created by or available to the user
     // 1. Fetch all events created by or available to the user
-    $events = auth()->user()->events;
+    
 
     // 2. Set default active event in session if none is currently selected
     if (!session()->has('active_event_id') && $events->isNotEmpty()) {

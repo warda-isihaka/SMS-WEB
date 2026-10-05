@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\Role;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -51,50 +52,51 @@ class User extends Authenticatable
         return $this->hasMany(Event::class);
     }
 
-    /**
-     * Relationship: A User belongs to a Role
-     */
-    public function role()
-    {
-        return $this->belongsTo(Role::class, 'role_id');
-    }
-
-   
-     public function canViewBudget(): bool
+public function currentEventRoleName()
 {
-    return $this->role && in_array(strtolower($this->role->name), ['admin', 'accountant', 'committee']);
+    // First, check if user is system admin directly
+    if ($this->role && strtolower($this->role->name) === 'admin') {
+        return 'admin';
+    }
+
+    $eventId = session('active_event_id');
+    if (!$eventId) {
+        return null;
+    }
+
+    // Check role assigned in event_user table
+    $pivot = DB::table('event_user')
+        ->where('event_id', $eventId)
+        ->where('user_id', $this->id)
+        ->first();
+
+    if ($pivot && $pivot->role_id) {
+        $role = \App\Models\Role::find($pivot->role_id);
+        return $role ? strtolower(trim($role->name)) : null;
+    }
+
+    return null;
 }
-    /**
-     * Relationship: User's pledge
-     */
-    public function pledge()
-    {
-        return $this->hasOne(Pledge::class);
-    }
 
-    /**
-     * Helper: Check if user has 'admin' role dynamically by role name
-     */
-    public function isAdmin(): bool
-    {
-        return $this->role && strtolower($this->role->name) === 'admin';
-    }
+public function isAdmin(): bool
+{
+    return $this->currentEventRoleName() === 'admin';
+}
 
-    /**
-     * Helper: Check if user has 'accountant' role dynamically by role name
-     */
-    public function isAccountant(): bool
-    {
-        return $this->role && strtolower($this->role->name) === 'accountant';
-    }
+public function isAccountant(): bool
+{
+    return $this->currentEventRoleName() === 'accountant';
+}
 
-    /**
-     * Helper: Check if user has 'committee' role dynamically by role name
-     */
-    public function isCommittee(): bool
-    {
-        return $this->role && strtolower($this->role->name) === 'committee';
-    }
+public function isCommittee(): bool
+{
+    return $this->currentEventRoleName() === 'committee';
+}
 
+public function canViewBudget(): bool
+{
+    $role = $this->currentEventRoleName();
+    return in_array($role, ['admin', 'accountant', 'committee']);
+}
    
 }

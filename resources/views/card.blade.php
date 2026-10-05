@@ -193,23 +193,29 @@
 
    <!-- BUTTON YA KUDOWNLOAD KADI / REMAINING BALANCE -->
 @php
-    $pledge = auth()->user()->pledge ?? null;
-    $Amount = (float)($pledge->amount ?? $pledge->amount ?? 0);
+    $eventId = session('active_event_id');
+    
+    // Fetch pledge for the current active event directly from DB
+    $pledge = \App\Models\Pledge::where('user_id', auth()->id())
+        ->where('event_id', $eventId)
+        ->first();
+
+    $amount = (float)($pledge->amount ?? 0);
     $paid = (float)($pledge->paid ?? 0);
-    $Remain = max(0, $Amount - $paid);
+    $remain = max(0, $amount - $paid);
 @endphp
 
-@if($pledge && $Remain<= 0)
+{{-- Check if remaining balance is 0 or if pledge status is marked completed --}}
+@if(($pledge && $remain <= 0) || ($pledge && strtolower($pledge->status ?? '') === 'paid'))
     <button class="download-btn" onclick="downloadCard()">
         Download Card (PNG)
     </button>
 @else
     <p style="margin-top: 15px; color: #666; font-size: 14px; text-align: center;">
-        Remaining Balance: <strong>{{ number_format($Remain, 2) }} TZS</strong><br>
+        Remaining Balance: <strong>{{ number_format($remain, 2) }} TZS</strong><br>
         <small>(Pay full pledge to enable card download)</small>
     </p>
 @endif
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
    
