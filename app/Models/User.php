@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\Role;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
@@ -53,50 +54,61 @@ class User extends Authenticatable
     }
 
 public function currentEventRoleName()
-{
-    // First, check if user is system admin directly
-    if ($this->role && strtolower($this->role->name) === 'admin') {
-        return 'admin';
-    }
+    {
+        // 1. Check direct role assignment via user's role_id relationship
+        if ($this->role_id) {
+            $userRole = Role::find($this->role_id);
+            if ($userRole) {
+                $roleName = strtolower(trim($userRole->name));
+                // Checks for 'admin', 'adnib', or any admin variant
+                if (in_array($roleName, ['admin', 'adnib', 'system admin'])) {
+                    return 'admin';
+                }
+            }
+        }
 
-    $eventId = session('active_event_id');
-    if (!$eventId) {
+        $eventId = session('active_event_id');
+        if (!$eventId) {
+            return null;
+        }
+
+        // 2. Check role assigned in event_user table for active event
+        $pivot = DB::table('event_user')
+            ->where('event_id', $eventId)
+            ->where('user_id', $this->id)
+            ->first();
+
+        if ($pivot && $pivot->role_id) {
+            $role = Role::find($pivot->role_id);
+            if ($role) {
+                $roleName = strtolower(trim($role->name));
+                if (in_array($roleName, ['admin', 'adnib', 'system admin'])) {
+                    return 'admin';
+                }
+                return $roleName;
+            }
+        }
+
         return null;
     }
 
-    // Check role assigned in event_user table
-    $pivot = DB::table('event_user')
-        ->where('event_id', $eventId)
-        ->where('user_id', $this->id)
-        ->first();
-
-    if ($pivot && $pivot->role_id) {
-        $role = \App\Models\Role::find($pivot->role_id);
-        return $role ? strtolower(trim($role->name)) : null;
+    public function isAdmin(): bool
+    {
+        return $this->currentEventRoleName() === 'admin';
     }
 
-    return null;
-}
+    public function isAccountant(): bool
+    {
+        return $this->currentEventRoleName() === 'accountant';
+    }
 
-public function isAdmin(): bool
-{
-    return $this->currentEventRoleName() === 'admin';
-}
+    public function isCommittee(): bool
+    {
+        return $this->currentEventRoleName() === 'committee';
+    }
 
-public function isAccountant(): bool
-{
-    return $this->currentEventRoleName() === 'accountant';
-}
-
-public function isCommittee(): bool
-{
-    return $this->currentEventRoleName() === 'committee';
-}
-
-public function canViewBudget(): bool
-{
-    $role = $this->currentEventRoleName();
-    return in_array($role, ['admin', 'accountant', 'committee']);
-}
-   
-}
+    public function canViewBudget(): bool
+    {
+        $role = $this->currentEventRoleName();
+        return in_array($role, ['admin', 'accountant', 'committee']);
+    }}
