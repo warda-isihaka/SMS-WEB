@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware
+class Adminmiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
